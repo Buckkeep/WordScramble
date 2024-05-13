@@ -50,9 +50,8 @@ struct ContentView: View {
         // lowercase and trim new word
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         // Check at least one char
-        guard answer.count > 0 else {return}
+//        guard answer.count > 0 else {return}
         
-        // extra validation to come
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original!")
             return
@@ -65,6 +64,16 @@ struct ContentView: View {
         
         guard isReal(word: answer) else {
             wordError(title: "Word not recognised", message: "You can't just make them up, you know!")
+            return
+        }
+        
+        guard isLongEnough(word: answer) else {
+            wordError(title: "Too short!", message: "Your words must be at least three characters long.")
+            return
+        }
+        
+        guard isNotRootWord(word: answer, rootWord: rootWord) else {
+            wordError(title: "Cannot reuse root word", message: "You can't use the word we gave you.")
             return
         }
         
@@ -110,6 +119,22 @@ struct ContentView: View {
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspeltRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         return misspeltRange.location == NSNotFound
+    }
+    
+    func isLongEnough(word: String) -> Bool {
+        if word.count > 2 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func isNotRootWord(word:String, rootWord:String) -> Bool {
+        if word == rootWord {
+            return false
+        } else {
+            return true
+        }
     }
     
     func wordError(title: String, message:String) {
