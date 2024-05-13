@@ -43,14 +43,17 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
+            .toolbar {
+                Button("New Word") {
+                    startGame()
+                }
+            }
         }
     }
     
     func addNewWord() {
         // lowercase and trim new word
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        // Check at least one char
-//        guard answer.count > 0 else {return}
         
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original!")
