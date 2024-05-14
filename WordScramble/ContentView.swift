@@ -17,6 +17,10 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var rounds = 0
+    @State private var allRoundsScore = 0
+    @State private var currentRoundScore = 0
+    private var longestWord: Int { findLongestWord() }
     
     var body: some View {
         NavigationStack {
@@ -34,6 +38,13 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                Section {
+                    Text("Rounds played: \(rounds)")
+                    Text("Score from Previous Rounds: \(allRoundsScore)")
+                    Text("Score this round: \(currentRoundScore)")
+                    Text("Your longest word so far: \(longestWord) characters")
+                }
             }
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
@@ -46,6 +57,9 @@ struct ContentView: View {
             .toolbar {
                 Button("New Word") {
                     startGame()
+                    rounds += 1
+                    allRoundsScore += currentRoundScore
+                    currentRoundScore = 0
                 }
             }
         }
@@ -54,6 +68,7 @@ struct ContentView: View {
     func addNewWord() {
         // lowercase and trim new word
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        currentRoundScore += 1
         
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original!")
@@ -91,7 +106,7 @@ struct ContentView: View {
         // find the url for starttxt in the bundle
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
-                let allWords = startWords.components(separatedBy: "/n")
+                let allWords = startWords.components(separatedBy: "\n")
                 // pick a random element and assign it - remember it will be optional
                 rootWord = allWords.randomElement() ?? "silkworm"
                 return
@@ -144,6 +159,16 @@ struct ContentView: View {
         errorTitle = title
         errorMessage = message
         showingError = true
+    }
+    
+    func findLongestWord() -> Int {
+        var longest = 0
+        for word in usedWords {
+            if word.count > longest {
+                longest = word.count
+            }
+        }
+        return longest
     }
 }
 
